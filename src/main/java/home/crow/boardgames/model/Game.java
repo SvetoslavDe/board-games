@@ -1,7 +1,7 @@
 package home.crow.boardgames.model;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 import java.util.*;
 
 import javax.persistence.Entity;
@@ -17,7 +17,7 @@ public class Game {
 	private long id;
 	private String title;
 	private int year;
-	private Timestamp timestamp;
+	private LocalDate dateAdded;
 	@Transient
 	private List<Link> links = new ArrayList<>();
 	
@@ -28,7 +28,7 @@ public class Game {
 		this.id = id;
 		this.title = title;
 		this.year = year;
-		this.timestamp = Timestamp.valueOf(LocalDateTime.now());
+		this.dateAdded = LocalDate.now();
 	}
 	public long getId() {
 		return id;
@@ -53,8 +53,8 @@ public class Game {
 
 	
 	
-	public Timestamp getTimestamp() {
-		return timestamp;
+	public LocalDate getDateAdded() {
+		return dateAdded;
 	}
 
 	public List<Link> getLinks() {
