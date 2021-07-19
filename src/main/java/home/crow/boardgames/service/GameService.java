@@ -1,5 +1,7 @@
 package home.crow.boardgames.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,9 @@ public class GameService {
 	
 	@Autowired
 	private GameRepository gameRepository;
+	@Autowired
+	Scraper scraper;
+	int days =5;
 	
 	public List<Game> getGames() {
 		List<Game> games = new ArrayList<>();
@@ -22,21 +27,27 @@ public class GameService {
 	}
 	
 	public List<Game> updateGames() {
-		Scraper scraper = new Scraper();
 		List<Game> addedGames = new ArrayList<>();
-		gameRepository.saveAll(scraper.scrape()).forEach(addedGames::add);		
+		gameRepository.saveAll(Scraper.scrape()).forEach(addedGames::add);		
 		return addedGames;
 	}
 	
 	public void deleteGames() {
 		gameRepository.deleteAll();		
 	}
-	
+	public List<Game> getGameByTitle(String title){
+		List<Game> games = new ArrayList<>();
+		gameRepository.findByTitle(title).forEach(games::add);
+		return games;
+	}	
 	public Game getGameById(long id) {
-		return gameRepository.findById(id).get();		
+		Optional<Game> result = gameRepository.findById(id);
+		if(result.isPresent() && 
+		Timestamp.valueOf(LocalDateTime.now()).getNanos()<(result.get().getTimestamp().getNanos()+days*24*60*60*1000)){
+			return result.get();	
+		} else {
+			return scraper.scrapeById(id);
+		}
 	}
-//	public Game getGameByTitle(String title) {
-//		return gameRepository.findAllByTitle
-//	}
-
+	
 }

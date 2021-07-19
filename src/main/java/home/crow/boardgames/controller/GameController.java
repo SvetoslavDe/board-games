@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriBuilder;
 
 
 @RestController
@@ -23,12 +23,21 @@ public class GameController {
 	GameService gameService;
 	
 	@GetMapping
-	public List<Game> getAllGames(HttpServletRequest hsr){
-		List<Game> allGames = gameService.getGames();
-		for(Game game: allGames) {
-		game.addLinks(hsr.getRequestURL().toString() + game.getId(), "self");
+	public List<Game> getAllGames(HttpServletRequest hsr, @RequestParam(required = false) String title){
+		if (title ==null) {
+			List<Game> allGames = gameService.getGames();
+			for(Game game: allGames) {
+			game.addLinks(hsr.getRequestURL().toString() + "/" + game.getId(), "self");
+			}
+			return allGames;
+		} else {
+			List<Game> allGames = gameService.getGameByTitle(title);
+			for(Game game: allGames) {
+			game.addLinks(hsr.getRequestURL().toString() + "/" + game.getId(), "self");
+			}
+			return allGames;
 		}
-		return allGames;
+		
 	}
 	
 	@GetMapping("/{gameId}")
@@ -38,7 +47,7 @@ public class GameController {
 		return game;
 	}
 	
-	@PostMapping("/update")
+	@GetMapping("/update")
 	public List<Game> updateGameDB() {
 		gameService.deleteGames();
 		return gameService.updateGames();
