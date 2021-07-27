@@ -1,4 +1,5 @@
 package home.crow.boardgames.controller;
+import home.crow.boardgames.exceptions.IdNotFoundEx;
 import home.crow.boardgames.model.*;
 import home.crow.boardgames.service.GameService;
 
@@ -41,9 +42,13 @@ public class GameController {
 	
 	@GetMapping("/{gameId}")
 	public Game getGameById(@PathVariable long gameId, HttpServletRequest hsr) {
-		Game game = gameService.getGameById(gameId);
+		try{
+			Game game = gameService.getGameById(gameId);
 		game.addLinks(hsr.getRequestURL().toString(), "self");
 		return game;
+		} catch (IdNotFoundEx e) { 
+			return new Game (0, e.getMessage(), 0);
+		}
 	}
 	
 	@GetMapping("/update")

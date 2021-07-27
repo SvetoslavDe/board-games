@@ -1,8 +1,6 @@
 package home.crow.boardgames.service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Service;
 import home.crow.boardgames.model.*;
 import home.crow.boardgames.scraper.Scraper;
 import home.crow.boardgames.database.GameRepository;
+import home.crow.boardgames.exceptions.IdNotFoundEx;
 
 @Service
 public class GameService {
@@ -49,7 +48,14 @@ public class GameService {
 		LocalDate.now().isBefore(result.get().getDateAdded().plusDays(days))){
 			return result.get();	
 		} else {
-			return scraper.scrapeById(id);
+			try {
+				Game game = scraper.scrapeById(id);
+				gameRepository.save(game);
+				return game;
+				} catch (RuntimeException e) {
+					throw new IdNotFoundEx("id not found");				
+				}
+			
 		}
 	}
 	

@@ -18,9 +18,6 @@ import home.crow.boardgames.model.Game;
 @Service
 public class Scraper {
 	
-	@Autowired
-	private GameRepository gameRepository;
-	
 	public Game scrapeById(Long id) {
 		final String url = "https://boardgamegeek.com/boardgame/" + id;
 		WebClient client = new WebClient();
@@ -35,7 +32,6 @@ public class Scraper {
 		String title = document.select("h1 > a.ng-binding").text();
 		int year = Integer.parseInt(document.select("span.game-year").text().substring(1,5));
 		Game game = new Game(id, title, year);
-		gameRepository.save(game);
 		return game;
 		
 		}
