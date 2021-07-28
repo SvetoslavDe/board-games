@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import home.crow.boardgames.model.*;
+import home.crow.boardgames.scraper.IdScraper;
 import home.crow.boardgames.scraper.Scraper;
 import home.crow.boardgames.database.GameRepository;
 import home.crow.boardgames.exceptions.IdNotFoundEx;
@@ -43,13 +44,14 @@ public class GameService {
 		return games;
 	}	
 	public Game getGameById(long id) {
+		IdScraper idScraper = new IdScraper(id);
 		Optional<Game> result = gameRepository.findById(id);
 		if(result.isPresent() && 
 		LocalDate.now().isBefore(result.get().getDateAdded().plusDays(days))){
 			return result.get();	
 		} else {
 			try {
-				Game game = scraper.scrapeById(id);
+				Game game = idScraper.scrape();
 				gameRepository.save(game);
 				return game;
 				} catch (RuntimeException e) {
